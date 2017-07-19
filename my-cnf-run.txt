@@ -1,0 +1,213 @@
+Standard ML of New Jersey v110.76 [built: Tue Oct 22 14:04:11 2013]
+- [opening /home/rr655745/cnf.sml]
+[autoloading]
+[library $smlnj/compiler/current.cm is stable]
+[library $smlnj/compiler/x86.cm is stable]
+[library $smlnj/viscomp/core.cm is stable]
+[library $smlnj/viscomp/basics.cm is stable]
+[library $smlnj/viscomp/elabdata.cm is stable]
+[library $smlnj/viscomp/elaborate.cm is stable]
+[library $SMLNJ-BASIS/basis.cm is stable]
+[library $smlnj/viscomp/debugprof.cm is stable]
+[library $SMLNJ-LIB/Util/smlnj-lib.cm is stable]
+[library $smlnj/MLRISC/Control.cm is stable]
+[library $SMLNJ-MLRISC/Control.cm is stable]
+[library $controls-lib.cm(=$SMLNJ-LIB/Controls)/controls-lib.cm is stable]
+[library $smlnj/smlnj-lib/controls-lib.cm is stable]
+[autoloading done]
+val it = () : unit
+val it = () : unit
+infix -->
+infix v
+infix &
+infix <->
+datatype sentence
+  = & of sentence * sentence
+  | --> of sentence * sentence
+  | <-> of sentence * sentence
+  | P
+  | Q
+  | R
+  | S
+  | T
+  | v of sentence * sentence
+  | ~ of sentence
+val removeArrows = fn : sentence -> sentence
+val bringInNegation = fn : sentence -> sentence
+val distribDisjInConj2 = fn : sentence * sentence -> sentence
+val distribDisjInConj = fn : sentence -> sentence
+val cnf = fn : sentence -> sentence
+val show2 = fn : sentence -> unit
+val show = fn : sentence -> unit
+val run = fn : sentence -> unit
+val printNStr = fn : string * int -> unit
+[autoloading]
+[autoloading done]
+val go1 = fn : int * int * sentence list -> unit
+val go = fn : sentence list -> unit
+val it = () : unit
+- [opening /home/rr655745/tests.sml]
+val f1 = P : sentence
+val f2 = ~ P : sentence
+val f3 = ~ (~ P) : sentence
+val f4 = ~ (~ (~ P)) : sentence
+val f5 = P v ~ P : sentence
+val f6 = P --> Q : sentence
+val f7 = P <-> Q : sentence
+val f8 = P v Q --> P : sentence
+val f9 = S & T v (Q & R) : sentence
+val f10 = ~ S & ~ T : sentence
+val f11 = ~ (P --> (~ Q --> ~ P)) : sentence
+val f12 = P --> Q & (Q --> R) : sentence
+val f13 = P --> Q & (Q --> R) --> (P --> R) : sentence
+val f14 = ~ (P --> ~ Q v (~ P & ~ Q)) : sentence
+val f15 = P & Q --> P : sentence
+val f16 = P & Q v (R & S) : sentence
+val f17 = P --> Q --> (~ Q --> ~ P) : sentence
+val f18 = P --> ~ Q v (~ P & ~ Q) : sentence
+val f19 = P --> Q <-> (~ Q --> ~ P) : sentence
+val f20 = ~ (P --> ~ Q <-> (~ P & ~ Q)) : sentence
+val f21 = ~ (P --> ~ Q v (~ P & ~ Q)) : sentence
+val f22 = ~ (~ (P --> Q & (Q --> R) --> (P --> R))) : sentence
+val f23 = P --> Q v (Q --> R) : sentence
+val f24 = P --> Q & (Q --> R) --> (P --> R) : sentence
+val f25 = P & Q v (~ P & ~ R) v (S & T v (~ Q & ~ P)) : sentence
+val tests =
+  [P,~ P,~ (~ P),~ (~ (~ P)),P v ~ P,P --> Q,P <-> Q,P v Q --> P,
+   S & T v (Q & R),~ S & ~ T,~ (P --> (~ Q --> ~ P)),P --> Q & (Q --> R),
+   P --> Q & (Q --> R) --> (P --> R),~ (P --> ~ Q v (~ P & ~ Q)),P & Q --> P,
+   P & Q v (R & S),P --> Q --> (~ Q --> ~ P),P --> ~ Q v (~ P & ~ Q),
+   P --> Q <-> (~ Q --> ~ P),~ (P --> ~ Q <-> (~ P & ~ Q)),
+   ~ (P --> ~ Q v (~ P & ~ Q)),~ (~ (P --> Q & (Q --> R) --> (P --> R))),
+   P --> Q v (Q --> R),P --> Q & (Q --> R) --> (P --> R),
+   P & Q v (~ P & ~ R) v (S & T v (~ Q & ~ P))] : sentence list
+val it = () : unit
+- go tests;
+================================================================================
+                                                                      Example F1
+Sentence is: P
+ Its CNF is: P
+
+================================================================================
+                                                                      Example F2
+Sentence is: -P
+ Its CNF is: -P
+
+================================================================================
+                                                                      Example F3
+Sentence is: --P
+ Its CNF is: P
+
+================================================================================
+                                                                      Example F4
+Sentence is: ---P
+ Its CNF is: -P
+
+================================================================================
+                                                                      Example F5
+Sentence is: Pv-P
+ Its CNF is: Pv-P
+
+================================================================================
+                                                                      Example F6
+Sentence is: P->Q
+ Its CNF is: -PvQ
+
+================================================================================
+                                                                      Example F7
+Sentence is: P<->Q
+ Its CNF is: ((-PvP)&(-PvQ))&((-QvP)&(-QvQ))
+
+================================================================================
+                                                                      Example F8
+Sentence is: (PvQ)->P
+ Its CNF is: (Pv-P)&(Pv-Q)
+
+================================================================================
+                                                                      Example F9
+Sentence is: (S&T)v(Q&R)
+ Its CNF is: ((QvS)&(QvT))&((RvS)&(RvT))
+
+================================================================================
+                                                                     Example F10
+Sentence is: -S&-T
+ Its CNF is: -S&-T
+
+================================================================================
+                                                                     Example F11
+Sentence is: -(P->(-Q->-P))
+ Its CNF is: P&(-Q&P)
+
+================================================================================
+                                                                     Example F12
+Sentence is: (P->Q)&(Q->R)
+ Its CNF is: (-PvQ)&(-QvR)
+
+================================================================================
+                                                                     Example F13
+Sentence is: ((P->Q)&(Q->R))->(P->R)
+ Its CNF is: (((-PvR)v(QvP))&((-PvR)v(Qv-Q)))&(((-PvR)v(-RvP))&((-PvR)v(-Rv-Q)))
+
+================================================================================
+                                                                     Example F14
+Sentence is: -((P->-Q)v(-P&-Q))
+ Its CNF is: (P&Q)&(PvQ)
+
+================================================================================
+                                                                     Example F15
+Sentence is: (P&Q)->P
+ Its CNF is: (-Pv-Q)vP
+
+================================================================================
+                                                                     Example F16
+Sentence is: (P&Q)v(R&S)
+ Its CNF is: ((RvP)&(RvQ))&((SvP)&(SvQ))
+
+================================================================================
+                                                                     Example F17
+Sentence is: (P->Q)->(-Q->-P)
+ Its CNF is: ((Qv-P)vP)&((Qv-P)v-Q)
+
+================================================================================
+                                                                     Example F18
+Sentence is: (P->-Q)v(-P&-Q)
+ Its CNF is: ((-Pv-Q)v-P)&((-Pv-Q)v-Q)
+
+================================================================================
+                                                                     Example F19
+Sentence is: (P->Q)<->(-Q->-P)
+ Its CNF is: (((Pv(-PvQ))&(Pv(Qv-P)))&((-Qv(-PvQ))&(-Qv(Qv-P))))&(((-Qv(-PvQ))&(-Qv(Qv-P)))&((Pv(-PvQ))&(Pv(Qv-P))))
+
+================================================================================
+                                                                     Example F20
+Sentence is: -((P->-Q)<->(-P&-Q))
+ Its CNF is: (((PvQ)vP)&((PvQ)vQ))&(((-Pv-Q)v-P)&((-Pv-Q)v-Q))
+
+================================================================================
+                                                                     Example F21
+Sentence is: -((P->-Q)v(-P&-Q))
+ Its CNF is: (P&Q)&(PvQ)
+
+================================================================================
+                                                                     Example F22
+Sentence is: --(((P->Q)&(Q->R))->(P->R))
+ Its CNF is: (((-PvR)v(QvP))&((-PvR)v(Qv-Q)))&(((-PvR)v(-RvP))&((-PvR)v(-Rv-Q)))
+
+================================================================================
+                                                                     Example F23
+Sentence is: (P->Q)v(Q->R)
+ Its CNF is: (-PvQ)v(-QvR)
+
+================================================================================
+                                                                     Example F24
+Sentence is: ((P->Q)&(Q->R))->(P->R)
+ Its CNF is: (((-PvR)v(QvP))&((-PvR)v(Qv-Q)))&(((-PvR)v(-RvP))&((-PvR)v(-Rv-Q)))
+
+================================================================================
+                                                                     Example F25
+Sentence is: ((P&Q)v(-P&-R))v((S&T)v(-Q&-P))
+ Its CNF is: (((((-QvS)v(-PvP))&((-QvS)v(-PvQ)))&(((-QvS)v(-RvP))&((-QvS)v(-RvQ))))&((((-QvT)v(-PvP))&((-QvT)v(-PvQ)))&(((-QvT)v(-RvP))&((-QvT)v(-RvQ)))))&(((((-PvS)v(-PvP))&((-PvS)v(-PvQ)))&(((-PvS)v(-RvP))&((-PvS)v(-RvQ))))&((((-PvT)v(-PvP))&((-PvT)v(-PvQ)))&(((-PvT)v(-RvP))&((-PvT)v(-RvQ)))))
+
+================================================================================
+val it = () : unit
+- 
